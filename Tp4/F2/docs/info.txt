@@ -1,0 +1,104 @@
+femelle donne naissance tous les mois entre 3 et 9 enfant
+            plus de chance d'avoir 5,6 ou 7
+50% d'etre femme ou homme
+maturite sexuel entre 5 et 8 mois
+proba de vie :
+        adults: 60%
+        enfant: 35%
+        10 ans: 50%
+        11 ans: 40%
+        12 ans: 30%
+        13 ans: 20%
+        14 ans: 10%
+        15 ans: mort
+    Formule pour le calcul de mortalite pour adulte :
+
+proba de mort :
+        adulte : 40%
+        enfant : 65%
+        10 ans : 50%
+        11 ans : 60%
+        12 ans : 70%
+        13 ans : 80%
+        14 ans : 90%
+        15 ans : 100%
+
+3 fichier:
+    Lapin: juste des nombres et un constructeur
+        Si sexe = 0 : lapin est male
+        Si sexe = 1 : lapin est femelle
+    SimuUtils.java: lancement du programme
+    SimulationLapinApplication.java: ensemble des methodes utiliser pour la simulation
+
+    probleme: utilisation d'une liste probleme de parcours de boucle
+
+
+J'ai trop de mort parmi les lapins donc j'ai chercher des infos de survivabilite su internet que voici
+https://iere.org/what-is-the-survival-rate-of-wild-rabbits/
+nouvelle proba de vie plus realiste
+        nestling (avant 1 mois) : 20%
+        enfant (pas encore mature) : 50%
+        adulte : 80%
+        8 ans : 70%
+        9 ans : 60%
+        10 ans : 50%
+        11 ans : 40%
+        12 ans : 30%
+        13 ans : 20%
+        14 ans : 10%
+        15 ans : 0%
+proba de mort associe
+        nestling ( avant 1 mois) : 80%
+        enfant (pas encore mature) : 50%
+        adulte : 20%
+        8 ans : 30%
+        9 ans : 40%
+        10 ans : 50%
+        11 ans : 60%
+        12 ans : 70%
+        13 ans : 80%
+        14 ans : 90%
+        15 ans : 100%
+
+proba de mort V1:
+        adulte : 40%
+        enfant : 65%
+        10 ans : 50%
+        11 ans : 60%
+        12 ans : 70%
+        13 ans : 80%
+        14 ans : 90%
+        15 ans : 100%
+proba de mort V2:
+        nestling ( avant 1 mois) : 80%
+        enfant (pas encore mature) : 50%
+        adulte : 20%
+        8 ans : 30%
+        9 ans : 40%
+        10 ans : 50%
+        11 ans : 60%
+        12 ans : 70%
+        13 ans : 80%
+        14 ans : 90%
+        15 ans : 100%
+proba de mort V1 tous les mois:
+        adulte : 4,26%
+        enfant : 6,49%
+        10 ans : 5,61%
+        11 ans : 6,98%
+        12 ans : 8,47%
+        13 ans : 9,97%
+        14 ans : 12,60%
+        15 ans : 100%
+proba de mort V2 tous les mois:
+        nestling ( avant 1 mois) : 80%
+        enfant (pas encore mature) : 5,61%
+        adulte : 1,84%
+        8 ans : 2,96%
+        9 ans : 4,26%
+        10 ans : 5,61%
+        11 ans : 6,98%
+        12 ans : 8,47%
+        13 ans : 9,97%
+        14 ans : 12,60%
+        15 ans : 100%
