@@ -1,6 +1,5 @@
 package ISIMA.F2.assets;
 import ISIMA.F2.LoggerCSV;
-
 import org.apache.commons.math3.random.MersenneTwister;
 
 import java.util.LinkedList;
@@ -10,15 +9,56 @@ import java.util.Iterator;
  * Implementation de toutes les fonctions pour gérer la simulation
  */
 public class SimuUtils {
-
     /**
      * Suivi du nombre de lapins total qui sont né durant toute la simulation
      */
     private static int nbLapinTot=0;
+
+    /**
+     * Suivi du nombre de lapins total qui sont né durant un mois
+     */
+    private static int nbLapin=0;
+
+    /**
+     * Suivi du nombre de lapins de moins de 1 mois total qui sont mort durant la simulation
+     */
+    private static int nbBebeMortTot=0;
+    /**
+     * Suivi du nombre de lapins de moins de 1 mois qui sont mort au cours d'un mois
+     */
+    private static int nbBebeMort=0;
+
+    /**
+     * Suivi du nombre de lapins pas encore mature total qui sont mort durant la simulation
+     */
+    private static int nbEnfantMortTot=0;
+
+    /**
+     * Suivi du nombre de lapins non mature qui sont mort au cours d'un mois
+     */
+    private static int nbEnfantMort=0;
+
     /**
      * Suivi du nombre de lapins total qui sont mort durant la simulation
      */
+    private static int nbLapinMortTot=0;
+
+    /**
+     * Suivi du nombre de lapins total qui sont mort durant un mois
+     */
     private static int nbLapinMort=0;
+
+    /**
+     * Suivi du nombre de lapins mature qui sont mort au cours d'un mois
+     */
+    private static int nbAdulteMortTot=0;
+
+
+    /**
+     * Suivi du nombre de lapins de plus de 8 ans total qui sont mort durant la simulation
+     */
+    private static int nbAdulteMort=0;
+
 
 
     /**
@@ -80,8 +120,16 @@ public class SimuUtils {
     public LinkedList<Lapin> popInit(int nbPaire, LinkedList<Lapin> population,MersenneTwister rng){
         int i ;
         population.clear();
-        nbLapinMort = 0;
+        nbBebeMort = 0;
+        nbEnfantMort = 0;
+        nbAdulteMort = 0;
+        nbBebeMortTot = 0;
+        nbEnfantMortTot = 0;
+        nbAdulteMortTot = 0;
         nbLapinTot = 0;
+        nbLapinMort =0;
+        nbLapinMortTot =0;
+        nbLapin= 0;
         for (i=0; i<nbPaire ; i++){
             population.add(new Lapin(6,0,5) );
             population.add(new Lapin(6,1,5) );
@@ -133,10 +181,26 @@ public class SimuUtils {
             else if (age >= 108) sortie = nbAlea <0.0426;
             else if (age >= 96) sortie = nbAlea <0.0296;
             else sortie = nbAlea < 0.0184;
+            if (sortie){
+                nbAdulteMort++;
+                nbAdulteMortTot++;
+            }
         }
         else if (lapin.estMature == 0){
-            if (age < 1 ) sortie = nbAlea < 0.8;
-            else sortie = nbAlea < 0.0561;
+            if (age < 1 ){
+                sortie = nbAlea < 0.8;
+                if (sortie){
+                    nbBebeMort++;
+                    nbBebeMortTot++;
+                }
+            }
+            else {
+                sortie = nbAlea < 0.0561;
+                if (sortie){
+                    nbEnfantMort++;
+                    nbEnfantMortTot++;
+                }
+            }
         }
 
         return sortie;
@@ -157,6 +221,7 @@ public class SimuUtils {
                 it.remove();
                 lapin = null;
                 nbLapinMort++;
+                nbLapinMortTot++;
             }
         }
         //System.out.println("taille liste l : "+l.size());
@@ -222,6 +287,7 @@ public class SimuUtils {
                         for (i = 0; i < lapin.nbEnfantEnGestation; i++) {
                             nouveaux.add(new Lapin(0, rng.nextInt(2), possibilite[tirageProbaSelonPoids(poids, rng)]));
                             nbLapinTot++;
+                            nbLapin++;
                         }
                         lapin.nbEnfantEnGestation = 0;
                     }
@@ -242,7 +308,10 @@ public class SimuUtils {
      */
     public void nombreActuelLapin(int nbMois,LinkedList<Lapin> population){
         System.out.println("Nombre de lapins dans la population au mois "+nbMois+" : "+population.size());
-        System.out.println("Pour "+ nbLapinMort +" lapins mort et "+nbLapinTot + " naissances de lapins.\n");
+        System.out.println("Pour "+ nbLapinMortTot +" lapins mort et "+nbLapinTot + " naissances de lapins.");
+        System.out.println("Pour un total de "+ nbAdulteMortTot + " lapins matures morts, "+ nbEnfantMortTot + " enfants mort et "+nbBebeMortTot+" lapins juvéniles morts au total.");
+        System.out.println("Pour "+ nbLapinMort +" lapins mort et "+nbLapin + " naissances de lapins.");
+        System.out.println("Dont "+nbAdulteMort+" lapins matures, "+nbEnfantMort+" lapins non matures et "+nbBebeMort+" lapins juvéniles morts ce mois-ci\n");
     }
 
     /**
@@ -256,10 +325,15 @@ public class SimuUtils {
         int i;
         LoggerCSV logger = new LoggerCSV("logs/SimulationLapin",nbMois);
         for (i=0; i<nbMois; i++){
+            nbBebeMort=0;
+            nbEnfantMort=0;
+            nbAdulteMort=0;
+            nbLapinMort=0;
+            nbLapin = 0;
             population = simuler1Mois(population, rng);
             nombreActuelLapin(i+1,population);
 
-            logger.logMois(i+1, nbLapinTot-nbLapinMort, nbLapinMort);
+            logger.logMois(i+1, nbLapinTot-nbLapinMortTot, nbLapinMortTot,nbBebeMortTot,nbEnfantMortTot,nbAdulteMortTot,nbLapin,nbBebeMort,nbEnfantMort,nbAdulteMort,nbLapinMort);
 
         }
         logger.close();

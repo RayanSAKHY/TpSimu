@@ -25,7 +25,7 @@ public class LoggerCSV {
             fileName +="_" + dureeSimu + "_mois_"+ timestamp+".csv";
             writer = new FileWriter(fileName);
             writer.write("Timestamp : "+ timestamp + "\n");
-            writer.write("Mois,Lapins vivants,Lapins morts\n");
+            writer.write("Mois,Lapins vivants,Nombre de lapin juvéniles morts au total,Nombre de lapin enfant mort au total,Nombre de lapin adulte mort au total,Total de lapins morts,Nombre de naissance par mois,Nombre de lapin juvéniles morts par mois,Nombre de lapin enfant mort par mois,Nombre de lapin adulte mort par mois,Nombre de lapin mort en 1 mois\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,12 +35,14 @@ public class LoggerCSV {
      *Cette fonction ajoute les données de la simulation du mois actuel dans le fichier créé initialement
      * @param mois : indique le numero du mois où en est la simulation
      * @param vivants : indique le nombre de lapins qui sont vivants à l'instant t
-     * @param morts : indique le nombre de lapins morts
-     *
+     * @param mortsTot : indique le nombre de lapins morts
+     * @param mortsEnfants : indique le nombre de lapins non mature morts
+     * @param mortsAdulte : indique le nombre de lapins mature morts
+     * @param mortsBebe : indique le nombre de lapins de moins de 1 mois morts
      */
-    public void logMois(int mois, int vivants, int morts) {
+    public void logMois(int mois, int vivants, int mortsTot, int mortsBebeTot, int mortsEnfantsTot, int mortsAdulteTot, int naissanceMois, int mortsBebe, int mortsEnfants, int mortsAdulte, int mortsParMois) {
         try {
-            writer.write(mois + "," + vivants + "," + morts + "\n");
+            writer.write(mois + "," + vivants + "," + mortsBebeTot + "," + mortsEnfantsTot + "," + mortsAdulteTot + "," + mortsTot +","+naissanceMois+","+ mortsBebe + "," + mortsEnfants + "," + mortsAdulte + ","+mortsParMois+ "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -16,7 +16,7 @@ public class SimuLapinApplication {
         /*
           Initialisation de Mersenne Twister avec une seed donné
          */
-        MersenneTwister rng = new MersenneTwister(1413328263);
+        MersenneTwister rng = new MersenneTwister(887762873);
         /*
           Création de la liste chainée utilisée pour stocker les lapins
          */
@@ -29,8 +29,8 @@ public class SimuLapinApplication {
         /*
         Initialisation du temps de la simulation en mois
          */
-        int tempsSimu = 180;
-        int nbSimu = 5;
+        int tempsSimu = 192;
+        int nbSimu = 7;
         int i;
 
         for (i = 0; i<nbSimu ;i++){
