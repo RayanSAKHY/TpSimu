@@ -3,8 +3,8 @@ femelle donne naissance tous les mois entre 3 et 9 enfant
 50% d'etre femme ou homme
 maturite sexuel entre 5 et 8 mois
 proba de vie :
-        adults: 60%
         enfant: 35%
+        adults: 60%
         10 ans: 50%
         11 ans: 40%
         12 ans: 30%
@@ -14,8 +14,8 @@ proba de vie :
     Formule pour le calcul de mortalite pour adulte :
 
 proba de mort :
+	enfant : 65%
         adulte : 40%
-        enfant : 65%
         10 ans : 50%
         11 ans : 60%
         12 ans : 70%
