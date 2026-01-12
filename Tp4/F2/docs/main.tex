@@ -1,0 +1,320 @@
+\title{Compte rendu du TP4 -- Simulation de lapin}
+\author{Rayan SAKHY\\ISIMA -- École d'Ingénieurs en Informatique}
+\date{Janvier 2025}
+
+
+% gabarit_ISIMA.tex — gabarit prêt à remplir
+\documentclass{isima-report}
+
+% ===== Informations à personnaliser =====
+\renewcommand{\AuthorName}{Rayan SAKHY}
+\renewcommand{\AuthorEmail}{rayan.sakhy@etu.isima.fr}
+\renewcommand{\Course}{Simulation - Simulation de lapin TP4}
+\renewcommand{\ReportTitle}{Compte rendu Simulation}
+\renewcommand{\ShortTitle}{TpLapin}
+\renewcommand{\ReportSubtitle}{CSimulation d'une population de lapin sur plusieurs années}
+\renewcommand{\ReportDate}{Janvier 2025}
+
+\graphicspath{{images/}} %configuring the graphicx package
+
+\begin{document}
+
+\maketitle 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.05\textwidth]{codeExecution}
+\end{figure}
+
+\newpage
+\tableofcontents
+\newpage
+
+\newpage
+\listoffigures
+\newpage
+
+\section{Introduction}
+\subsection{Enoncé}
+L’objectif du TP est de concevoir une simulation stochastique à événements discrets pour modéliser la croissance d’une population de lapins de manière réaliste, en tenant compte de la naissance, de la mortalité et du vieillissement. Cette approche est dite individual-based modeling, car chaque lapin est représenté avec ses propres caractéristiques.
+
+
+Une femelle peut avoir entre 3 et 9 portées par an, avec une probabilité plus élevée pour 5, 6 ou 7. Chaque portée contient 3 à 6 lapereaux, avec une répartition sexuée aléatoire (≈50\% mâles/femelles).
+La maturité sexuelle est atteinte entre 5 et 8 mois.
+
+\subsection{Langage choisi}
+J'ai choisi le langage Java pour pouvoir modélisé des lapins en tant qu'objects. Les avantages du langage à object pour cette simulation sont la simplicité de modélisation et de modification et sa portabilité grâce à la machine virtuelle java, la JVM.
+
+\section{Choix de modélisation}
+\subsection{Intervalle de mise à jour}
+J'ai choisi de mettre à jour la population de lapins tous les mois pour plus de performance. La mise à jour de la liste de lapin tous les mois permet de limiter le nombre de lapin qu'on ajoute à la liste avant d'appliquer les probabilités de mort. Donc de limiter la taille temporaire de la liste.
+
+\subsection{Taux de mortalité}
+Je suis d'abord parti sur les hypothèses de l'énoncé qui concerne les chances de survie et de mort annuelle pour différentes classes d'âges de lapins qui sont : 
+
+\begin{tabular}{|c|c|c|}
+    \hline
+    Age ou stade de vie & Probabilité de vie & Probabilité de mort \\
+    \hline
+    Lapereaux & 35\% & 65\% \\
+    Adultes & 60\% & 40\% \\
+    10 ans & 50\% & 50\% \\
+    11 ans & 40\% & 60\% \\
+    12 ans & 30\% & 70\% \\
+    13 ans & 20\% & 80\% \\
+    14 ans & 10\% & 90\% \\
+    15 ans & 0\% & 100\% \\
+    \hline
+\end{tabular}
+
+\newpage
+Puis j'ai lancé la simulation en faisant un mise à jour tous les mois en utilisant ces probabilités mais mes lapins mourraient trop vite donc j'ai cherché des probabilités de mort plus réaliste.
+
+\\ J'ai trouvé sur ce site internet ( \href{https://iere.org/what-is-the-survival-rate-of-wild-rabbits/}{Taux de survie de lapin sauvage}) une piste de probabilité par an qui sont :
+
+\begin{tabular}{|c|c|c|}
+    \hline
+    Age ou stade de vie & Probabilité de vie & Probabilité de mort \\
+    \hline
+    Juvéniles (avant 1 mois) & 20\% & 80\% \\
+    Lapereaux (pas encore mature) & 50\% & 50\% \\
+    Adultes & 80\% & 20\% \\
+    8 ans & 70\% & 30\% \\
+    9 ans & 60\% & 40\% \\
+    10 ans & 50\% & 50\% \\
+    11 ans & 40\% & 60\% \\
+    12 ans & 30\% & 70\% \\
+    13 ans & 20\% & 80\% \\
+    14 ans & 10\% & 90\% \\
+    15 ans & 0\% & 100\% \\
+    \hline
+\end{tabular}
+
+Puis j'ai compris qu'il fallait que je passe les probabilité annuelles en probabilités mensuelles donc les probabilités de morts mensuelles correspondantes au deux choix faits sont :
+
+\begin{enumerate}
+    \item Probabilité dans l'énoncé
+    \begin{itemize}
+        \item Lapereaux : 6,49\%
+        \item Adulte : 4,26\%
+        \item 10 ans : 5,61\%
+        \item 11 ans : 6,98\%
+        \item 12 ans : 8,47\%
+        \item 13 ans : 9,97\%
+        \item 14 ans : 12,60\%
+        \item 15 ans : 100\%
+    \end{itemize}
+    \item Probabilité trouvé sur internet
+    \begin{itemize}
+        \item Juvénile ( avant 1 mois) : 80\%
+        \item Lapereaux (pas encore mature) : 5,61\%
+        \item Adultes : 1,84\%
+        \item 8 ans : 2,96\%
+        \item 9 ans : 4,26\%
+        \item 10 ans : 5,61\%
+        \item 11 ans : 6,98\%
+        \item 12 ans : 8,47\%
+        \item 13 ans : 9,97\%
+        \item 14 ans : 12,60\%
+        \item 15 ans : 100\%
+    \end{itemize}
+\end{enumerate}
+\subsection{Probabilité utilisé pour les autres aspect de la simulation}
+Pour déterminer le nombre de portée et le nombre de lapereaux par portée j'ai utilisé une méthode pour obtenir des probabilité à partir de d'un tableau qui liste les chances de chaque possibilité d'un événement.\\
+\\Voici le code en question :
+\begin{lstlisting}[style=java]
+private static int tirageProbaSelonPoids(double[] poids,MersenneTwister rng ) {
+        double total = 0;
+        double nbAlea;
+        double cumul = 0;
+        int i;
+
+
+        for (double p : poids) {
+            total += p;
+        }
+
+        nbAlea = rng.nextDouble() * total;
+
+        for (i = 0; i < poids.length; i++) {
+            cumul += poids[i];
+            if (nbAlea < cumul) return i;
+        }
+        return poids.length - 1;
+    }
+\end{lstlisting}
+
+\subsubsection{Nombre de portées}
+\begin{tabular}{|c|c|}
+    \hline
+    Nombre de portées & Probabilité \\
+    \hline
+    3 & 5\% \\
+    4 & 10\% \\
+    5 & 20\% \\
+    6 & 30\% \\
+    7 & 20\% \\
+    8 & 10\% \\
+    9 & 5\% \\
+    \hline
+\end{tabular}
+\\
+\\
+Cet ensemble de probabilité correspond plus à une gaussienne ce qui ne correspond pas vraiment a l'énoncé mais j'ai trouvé cela plu réaliste.
+        
+\subsubsection{Nombre le lapereaux par portée}
+\begin{tabular}{|c|c|}
+    \hline
+    Nombre de portées & Probabilité \\
+    \hline
+    3 & 25\% \\
+    4 & 25\% \\
+    5 & 25\% \\
+    6 & 25\% \\
+    \hline
+\end{tabular}
+\\
+\\
+Pour ce qui est du nombre de lapereaux par portée j'ai mis en place une équiprobabilité.
+        
+\subsection{Durée de simulation}
+
+Pour la durée de simulation j'ai choisi de faire durer la simulation pendant 16 ans, c'est à dire pendant \textbf{192 mois}. Puisque ce sont les limites imposés par mon ordinateur et par mes choix de modélisation.
+\section{Résultats}
+\subsection{Exemple de donnée brute}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.05\textwidth]{donneeBrute}
+    \caption{Un exemple des données brutes mises en forme}
+    \label{fig:data}
+\end{figure}
+\subsection{Données mises sous forme de graphe}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{grapheLapinVivantMoyenne}
+    \caption{Graphe indiquant le nombrre de lapin vivant et de son écart type en fonction du temps}
+    \label{fig:lapinVivantMoyenne}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{grapheLapinMortParMoisEcartType}
+    \caption{Graphe mettant en avant le relation entre la moyenne et l'écart type du nombre de mort par mois}
+    \label{fig:LapinMortParMoisEcartType}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{GrapheLapinJuvenileMortProportion}
+    \caption{Graphe indiquant la proportion de mort juvénile parmi les lapins}
+    \label{fig:porportionLapinJuvenileMort}
+\end{figure}
+\newpage
+\section{Analyse des résultats}
+\subsection{Dynamique globale de la population}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_dynamiqueGlob.png}
+    \caption{Relation entre le nombre de lapins vivants et le nombre total de morts cumulés}
+    \label{fig:dynamiqueGlob}
+\end{figure}
+
+La mortalité cumulée croît de manière exponentielle avec la taille de la population vivante. Cette tendance illustre que plus la population augmente, plus le nombre de décès s’accélère, conséquence directe de la dynamique de reproduction et du vieillissement massif. Les premières phases montrent une croissance lente, mais à partir de plusieurs millions d’individus, la mortalité explose, confirmant l’effet cumulatif des générations.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_Delta.png}
+    \caption{Naissances vs Morts par mois et Croissance nette (Δ)}
+    \label{fig:dynamiqueDelta}
+\end{figure}
+
+La croissance nette reste positive tout au long de la simulation, mais l’écart entre naissances et morts diminue en fin de période. Cela traduit un ralentissement relatif de la dynamique, probablement lié à la saturation et au vieillissement de la population. Les naissances dominent largement les décès jusqu’à la fin, mais la convergence des courbes suggère une stabilisation à long terme.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_cascade1-16.png}
+    \caption{Cascade annuelle détaillée (Naissances et Morts séparées)}
+    \label{fig:cascadeDetail}
+\end{figure}
+
+Cette cascade illustre l’accumulation des flux annuels. Les premières années contribuent peu à la croissance, mais à partir de la douzième année, les naissances et morts deviennent massives, dépassant plusieurs dizaines de millions par an. La lisibilité est limitée par l’échelle, mais elle confirme la dynamique exponentielle et l’importance des dernières années dans la population finale.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_cascadeSolde.png}
+    \caption{Cascade annuelle simplifiée (Solde net par année)}
+    \label{fig:cascadeSolde}
+\end{figure}
+
+Le solde annuel reste positif chaque année, confirmant une croissance continue. Après l’année 12, la dynamique s’emballe, avec un gain net supérieur à 15 millions en année 16. Ce graphique est plus lisible que la version détaillée et met en évidence la tendance globale.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_cascade1-4.png}
+    \caption{Cascade annuelle sur les 4 premières années (zoom)}
+    \label{fig:cascadeZoom}
+\end{figure}
+
+Le zoom sur les premières années montre une croissance lente et équilibrée. Les naissances dépassent légèrement les morts, mais la dynamique reste modérée avant la phase exponentielle. Cette vue est utile pour analyser la phase initiale sans être écrasée par les valeurs extrêmes des dernières années.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_histogrammeEmpile.png}
+    \caption{Histogramme empilé des décès par catégorie d'âge (valeurs absolues)}
+    \label{fig:decesEmpile}
+\end{figure}
+
+Cet histogramme empilé illustre la répartition des décès par catégorie d'âge (juvéniles, non matures, matures) au fil des mois. 
+\textbf{Observation} : La mortalité juvénile domine largement (\textgreater 90\%) tout au long de la simulation. Les décès non matures apparaissent après environ 5 mois, mais restent faibles. Les décès matures sont quasi inexistants avant 8 ans.
+\newline
+\textbf{Astuce} : Si les petites catégories sont invisibles, il est recommandé d'activer l'échelle logarithmique sur l'axe des ordonnées.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_histogramme100.png}
+    \caption{Histogramme 100\% empilé des proportions de décès par catégorie d'âge}
+    \label{fig:decesProportions}
+\end{figure}
+
+Ce graphique montre la part relative de chaque catégorie dans les décès totaux. 
+\textbf{Observation} : La proportion de décès juvéniles se stabilise entre 92\% et 95\% après environ 40 mois. Les non matures représentent environ 4 à 5\%, tandis que les matures restent inférieurs à 1\%.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/graphe_courbesProportions.png}
+    \caption{Courbes des proportions de décès par catégorie d'âge}
+    \label{fig:decesCourbes}
+\end{figure}
+
+Ce graphique en courbes rend visibles les petites proportions. 
+\textbf{Observation} : Les proportions se stabilisent rapidement : juvéniles autour de 93\%, non matures environ 5\%, matures inférieurs à 1\%. Cette représentation est utile pour analyser les tendances fines qui sont peu visibles dans les histogrammes empilés.
+
+\subsection{Variabilité par tranches (Boxplots)}
+Cette sous section analyse la dispersion des indicateurs clés (vivants, naissances, morts mensuels) et la stabilité des tendances au cours des 16 années simulées. L’objectif est d’évaluer la robustesse du modèle et la variabilité inter-mois et inter-simulations.
+Pour éviter la surcharge visuelle (192 mois), les données ont été regroupées en quatre tranches annuelles : Années 1--4, 5--8, 9--12, 13--16.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{images/boxplot_vivants_tranches.png}
+  \caption{Variabilité par tranches (boîtes à moustaches) -- Vivants.}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{images/boxplot_naissances_tranches.png}
+  \caption{Variabilité par tranches -- Naissances.}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{images/boxplot_morts_tranches.png}
+  \caption{Variabilité par tranches -- Morts mensuels.}
+\end{figure}
+
+\subsection{Moyenne vs Médiane avec bande $\pm$ Écart-type}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{images/moy_med_et_vivants.png}
+  \caption{Moyenne et médiane mensuelles des vivants, avec bande $\pm$ écart-type.}
+\end{figure}
+
+\newpage
+\section{Conclusion}
+
+\section{Annexe}
+
+\end{document}
