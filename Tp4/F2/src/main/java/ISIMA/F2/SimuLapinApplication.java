@@ -25,24 +25,25 @@ public class SimuLapinApplication {
         /*
         Initialisation de l'objet pour utiliser les fonctions de la simulation
          */
-        SimuUtils s = new SimuUtils();
+        SimuUtils s;
         /*
         Initialisation du temps de la simulation en mois
          */
         int tempsSimu = 192;
-        int nbSimu = 7;
+        int nbSimu = 40;
         int i;
 
         for (i = 0; i<nbSimu ;i++){
+            s= new SimuUtils();
             /*
             Initialisation de la population avec 2 couples
              */
-                population = s.popInit(2,population,rng);
+            population = s.popInit(2,population,rng);
 
             /*
             Calcul de la population après le temps de simulation voulu
              */
-                population = s.Simulation(tempsSimu,population,rng);
+            population = s.Simulation(tempsSimu,population,rng,i);
         }
 
     }

@@ -1,3 +1,6 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
 \title{Compte rendu du TP4 -- Simulation de lapin}
 \author{Rayan SAKHY\\ISIMA -- École d'Ingénieurs en Informatique}
 \date{Janvier 2025}
@@ -5,6 +8,8 @@
 
 % gabarit_ISIMA.tex — gabarit prêt à remplir
 \documentclass{isima-report}
+
+
 
 % ===== Informations à personnaliser =====
 \renewcommand{\AuthorName}{Rayan SAKHY}
@@ -18,6 +23,9 @@
 \graphicspath{{images/}} %configuring the graphicx package
 
 \begin{document}
+
+\renewcommand\lstlistingname{Code}
+\renewcommand\lstlistlistingname{Table des Annexes}
 
 \maketitle 
 \begin{figure}[h]
@@ -33,24 +41,28 @@
 \listoffigures
 \newpage
 
+\newpage
+\lstlistoflistings
+\newpage
+
 \section{Introduction}
 \subsection{Enoncé}
 L’objectif du TP est de concevoir une simulation stochastique à événements discrets pour modéliser la croissance d’une population de lapins de manière réaliste, en tenant compte de la naissance, de la mortalité et du vieillissement. Cette approche est dite individual-based modeling, car chaque lapin est représenté avec ses propres caractéristiques.
 
 
-Une femelle peut avoir entre 3 et 9 portées par an, avec une probabilité plus élevée pour 5, 6 ou 7. Chaque portée contient 3 à 6 lapereaux, avec une répartition sexuée aléatoire (≈50\% mâles/femelles).
+Une femelle peut avoir entre 3 et 9 portées par an, avec une probabilité plus élevée pour 5, 6 ou 7. Chaque portée contient 3 à 6 lapereaux, avec une répartition sexuée aléatoire ($\approx$50\% mâles/femelles).
 La maturité sexuelle est atteinte entre 5 et 8 mois.
 
 \subsection{Langage choisi}
-J'ai choisi le langage Java pour pouvoir modélisé des lapins en tant qu'objects. Les avantages du langage à object pour cette simulation sont la simplicité de modélisation et de modification et sa portabilité grâce à la machine virtuelle java, la JVM.
+J'ai choisi le langage Java pour pouvoir modéliser des lapins en tant qu'objets. Les avantages du langage à objet pour cette simulation sont la simplicité de modélisation et de modification et sa portabilité grâce à la machine virtuelle java, la JVM.
 
 \section{Choix de modélisation}
 \subsection{Intervalle de mise à jour}
-J'ai choisi de mettre à jour la population de lapins tous les mois pour plus de performance. La mise à jour de la liste de lapin tous les mois permet de limiter le nombre de lapin qu'on ajoute à la liste avant d'appliquer les probabilités de mort. Donc de limiter la taille temporaire de la liste.
+J'ai choisi de mettre à jour la population de lapins tous les mois pour plus de performance. La mise à jour de la liste de lapin tous les mois permet de limiter le nombre de lapin qu'on ajoute à la liste avant d'appliquer les probabilités de mort, donc de limiter la taille temporaire de la liste.
 
 \subsection{Taux de mortalité}
 Je suis d'abord parti sur les hypothèses de l'énoncé qui concerne les chances de survie et de mort annuelle pour différentes classes d'âges de lapins qui sont : 
-
+\newline
 \begin{tabular}{|c|c|c|}
     \hline
     Age ou stade de vie & Probabilité de vie & Probabilité de mort \\
@@ -67,10 +79,11 @@ Je suis d'abord parti sur les hypothèses de l'énoncé qui concerne les chances
 \end{tabular}
 
 \newpage
-Puis j'ai lancé la simulation en faisant un mise à jour tous les mois en utilisant ces probabilités mais mes lapins mourraient trop vite donc j'ai cherché des probabilités de mort plus réaliste.
+Puis j'ai lancé la simulation en faisant un mise à jour tous les mois en utilisant ces probabilités mais mes lapins mourraient trop vite donc j'ai cherché des probabilités de mort plus réalistes.
 
-\\ J'ai trouvé sur ce site internet ( \href{https://iere.org/what-is-the-survival-rate-of-wild-rabbits/}{Taux de survie de lapin sauvage}) une piste de probabilité par an qui sont :
-
+J'ai trouvé sur ce site internet (\href{https://iere.org/what-is-the-survival-rate-of-wild-rabbits/}{Taux de survie de lapin sauvage}) une piste de probabilité par an qui sont :
+\newline
+\vspace{0.3 cm}
 \begin{tabular}{|c|c|c|}
     \hline
     Age ou stade de vie & Probabilité de vie & Probabilité de mort \\
@@ -88,6 +101,7 @@ Puis j'ai lancé la simulation en faisant un mise à jour tous les mois en utili
     15 ans & 0\% & 100\% \\
     \hline
 \end{tabular}
+\vspace{0.2 cm}
 
 Puis j'ai compris qu'il fallait que je passe les probabilité annuelles en probabilités mensuelles donc les probabilités de morts mensuelles correspondantes au deux choix faits sont :
 
@@ -103,7 +117,7 @@ Puis j'ai compris qu'il fallait que je passe les probabilité annuelles en proba
         \item 14 ans : 12,60\%
         \item 15 ans : 100\%
     \end{itemize}
-    \item Probabilité trouvé sur internet
+    \item Probabilité trouvée sur Internet
     \begin{itemize}
         \item Juvénile ( avant 1 mois) : 80\%
         \item Lapereaux (pas encore mature) : 5,61\%
@@ -118,30 +132,11 @@ Puis j'ai compris qu'il fallait que je passe les probabilité annuelles en proba
         \item 15 ans : 100\%
     \end{itemize}
 \end{enumerate}
-\subsection{Probabilité utilisé pour les autres aspect de la simulation}
-Pour déterminer le nombre de portée et le nombre de lapereaux par portée j'ai utilisé une méthode pour obtenir des probabilité à partir de d'un tableau qui liste les chances de chaque possibilité d'un événement.\\
-\\Voici le code en question :
-\begin{lstlisting}[style=java]
-private static int tirageProbaSelonPoids(double[] poids,MersenneTwister rng ) {
-        double total = 0;
-        double nbAlea;
-        double cumul = 0;
-        int i;
+\newpage
+\subsection{Probabilité utilisée pour les autres aspects de la simulation}
+Pour déterminer le nombre de portées et le nombre de lapereaux par portée j'ai utilisé une méthode pour obtenir des probabilités à partir d'un tableau qui liste les chances de chaque possibilité d'un événement
+\\  \hyperref[lst:gener_proba]{tirageProbaSelonPoids(double[] poids,MersenneTwister rng)}:
 
-
-        for (double p : poids) {
-            total += p;
-        }
-
-        nbAlea = rng.nextDouble() * total;
-
-        for (i = 0; i < poids.length; i++) {
-            cumul += poids[i];
-            if (nbAlea < cumul) return i;
-        }
-        return poids.length - 1;
-    }
-\end{lstlisting}
 
 \subsubsection{Nombre de portées}
 \begin{tabular}{|c|c|}
@@ -159,7 +154,7 @@ private static int tirageProbaSelonPoids(double[] poids,MersenneTwister rng ) {
 \end{tabular}
 \\
 \\
-Cet ensemble de probabilité correspond plus à une gaussienne ce qui ne correspond pas vraiment a l'énoncé mais j'ai trouvé cela plu réaliste.
+Cet ensemble de probabilité correspond plus à une gaussienne ce qui ne correspond pas vraiment à l'énoncé mais j'ai trouvé cela plus réaliste.
         
 \subsubsection{Nombre le lapereaux par portée}
 \begin{tabular}{|c|c|}
@@ -178,7 +173,58 @@ Pour ce qui est du nombre de lapereaux par portée j'ai mis en place une équipr
         
 \subsection{Durée de simulation}
 
-Pour la durée de simulation j'ai choisi de faire durer la simulation pendant 16 ans, c'est à dire pendant \textbf{192 mois}. Puisque ce sont les limites imposés par mon ordinateur et par mes choix de modélisation.
+Pour la durée de simulation j'ai choisi de faire durer la simulation pendant 16 ans, c'est à dire pendant \textbf{192 mois} pour 31 itérations de la simulation. Puisque ce sont les limites imposées par mon ordinateur et par mes choix de modélisation.
+
+\section{Explication du code}
+Dans cette partie je vais expliquer la structure et la logique de mon code. En commençant par sa structure.
+\subsection{La structure du code}
+Dans mon code il y  a 4 classes :
+\begin{itemize}
+	\item Une qui exécute le programme
+	\item Une qui stocke un lapin
+	\item Une qui gère un logger pour récupérer les données
+	\item Une qui contient la logique métier de la simulation
+\end{itemize}
+
+\subsubsection{La classe SimuLapinApplication}
+Cette classe initialise Mersenne Twister et utilise la classe \textbf{\hyperref[subsub:simuUtils]{SimuUtils}}
+
+\subsubsection{La classe SimuUtils }
+\label{subsub:simuUtils}
+Cette classe permet de gérer les morts et les naissances de ces lapins. Ainsi que l'affichage d'informations dans la console pour le débogage, la simulation d'un mois et la simulation des 16 ans.
+
+\subsubsection{La classe Lapin}
+Cette classe contient toutes les données relatives aux lapins, c'est à dire l'âge, le sexe, l'âge de maturité, si le lapin est mature ou non, le nombre de portées restantes et si la lapine est en période de gestation.
+\newline
+L'information du nombre de portée restante et de la gestation ne concerne que les femelles donc je l'initialise pour les mâles puis je ne change pas sa valeur.
+
+\subsubsection{La classe LoggerCSV} 
+Cette classe bufferise des informations sur l'exécution du programme puis les écrit dans un fichier pour réaliser des logs utiles pour l'analyse des données.
+
+\subsection{Certains codes en particulier}
+
+\subsubsection{\hyperref[lst:initTab]{initHazards()}}
+Cette fonction est appelé une seule fois au tout début du programme ce qui permet d'éviter un coût algorithmiques à chaque execution de la vérification de morts des lapins.
+
+\subsubsection{\hyperref[lst:verifProbaMort]{estMortVX(Lapin lapin, double nbAlea)}}
+Ces 2 fonctions utilise la fonction \hyperref[lst:initTab]{initHazards()} à chaque vérification de la mort d'un lapin. Cette méthode permet de n'avoir que des accès en O(1) pour la récupération de la probabilité seuil de mort du lapin en fonction de son age.
+
+\subsubsection{\hyperref[lst:misAJour]{private void miseAjourListe(MersenneTwister rng,LinkedList<Lapin> population)}}
+Cette fonction met à jour l'age de tous les lapins de listes et et vérifie si ils deviennent mature. Cette fonction reinitialise aussi le nombre de portée restante pour toutes les lapines matures selon leur âges.
+
+\subsubsection{\hyperref[lst:naissance]{public LinkedList<Lapin> naissance(LinkedList<Lapin> population, MersenneTwister rng)}}
+Cette fonction vérifie d'abord si il existe un lapin male parmi tous les lapins. Dès que ce lapin est trouvé je crée une nouvelle liste de lapin qui contiendra uniquement les lapins qui sont nés durant le mois. 
+\newline
+Pour chaque lapines mature qui peut encore faire des portées je vérifie qu'elle n'ait pas été fécondé le mois dernier. Si elle a été fécondé on ajoute à la liste des nouveaux lapins le nombre de bébé qu'elle met à bas puis je réinitialise le nombre d'enfant en formation.
+\newline Si elle n'a pas été fécondé je fixe le nombre d'enfant qu'elle va faire naître le mois prochain et je réduits le nombre de portée quelle peut avoir.
+
+\subsubsection{\hyperref[lst:loggerInit]{public LoggerCSV(String fileName, int dureeSimu, int numeroSimu)}}
+Cette fonction permet de créer un fichier qui a un nom composé du temps de la simulation du time stamp et du numéro de la simulation. Ce nom de fichier permet d'assurer son unicité. De plus j'ajoutes les noms des colonnes dans un StringBuilder/
+
+\subsubsection{\hyperref[lst:ajoutDonneeLogger]{public void logMois(int mois, int vivants, int mortsTot, int mortsBebeTot, int mortsEnfantsTot, int mortsAdulteTot, int naissanceMois, int mortsBebe, int mortsEnfants, int mortsAdulte, int mortsParMois)}}
+Cette fonction est éxécuté chaque mois et elle permet d'ajouter au StringBuilder les données de chaque mois.
+
+
 \section{Résultats}
 \subsection{Exemple de donnée brute}
 \begin{figure}[h]
@@ -187,17 +233,18 @@ Pour la durée de simulation j'ai choisi de faire durer la simulation pendant 16
     \caption{Un exemple des données brutes mises en forme}
     \label{fig:data}
 \end{figure}
+\newpage
 \subsection{Données mises sous forme de graphe}
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{grapheLapinVivantMoyenne}
-    \caption{Graphe indiquant le nombrre de lapin vivant et de son écart type en fonction du temps}
+    \caption{Graphe indiquant le nombre de lapins vivants et de son écart type en fonction du temps}
     \label{fig:lapinVivantMoyenne}
 \end{figure}
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{grapheLapinMortParMoisEcartType}
-    \caption{Graphe mettant en avant le relation entre la moyenne et l'écart type du nombre de mort par mois}
+    \caption{Graphe mettant en avant la relation entre la moyenne et l'écart type du nombre de morts par mois}
     \label{fig:LapinMortParMoisEcartType}
 \end{figure}
 \begin{figure}
@@ -221,7 +268,7 @@ La mortalité cumulée croît de manière exponentielle avec la taille de la pop
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{images/graphe_Delta.png}
-    \caption{Naissances vs Morts par mois et Croissance nette (Δ)}
+    \caption{Naissances vs Morts par mois et Croissance nette ($\Delta$)}
     \label{fig:dynamiqueDelta}
 \end{figure}
 
@@ -262,9 +309,9 @@ Le zoom sur les premières années montre une croissance lente et équilibrée. 
 \end{figure}
 
 Cet histogramme empilé illustre la répartition des décès par catégorie d'âge (juvéniles, non matures, matures) au fil des mois. 
+\newline
 \textbf{Observation} : La mortalité juvénile domine largement (\textgreater 90\%) tout au long de la simulation. Les décès non matures apparaissent après environ 5 mois, mais restent faibles. Les décès matures sont quasi inexistants avant 8 ans.
 \newline
-\textbf{Astuce} : Si les petites catégories sont invisibles, il est recommandé d'activer l'échelle logarithmique sur l'axe des ordonnées.
 
 \begin{figure}[H]
     \centering
@@ -274,6 +321,7 @@ Cet histogramme empilé illustre la répartition des décès par catégorie d'â
 \end{figure}
 
 Ce graphique montre la part relative de chaque catégorie dans les décès totaux. 
+\newline
 \textbf{Observation} : La proportion de décès juvéniles se stabilise entre 92\% et 95\% après environ 40 mois. Les non matures représentent environ 4 à 5\%, tandis que les matures restent inférieurs à 1\%.
 
 \begin{figure}[H]
@@ -283,28 +331,32 @@ Ce graphique montre la part relative de chaque catégorie dans les décès totau
     \label{fig:decesCourbes}
 \end{figure}
 
-Ce graphique en courbes rend visibles les petites proportions. 
-\textbf{Observation} : Les proportions se stabilisent rapidement : juvéniles autour de 93\%, non matures environ 5\%, matures inférieurs à 1\%. Cette représentation est utile pour analyser les tendances fines qui sont peu visibles dans les histogrammes empilés.
+Ce graphique en courbes rend visible les petites proportions. 
+\newline
+\textbf{Observation} : Les proportions se stabilisent rapidement : 
+\begin{itemize}
+	\item juvéniles autour de 93\%
+	\item non matures environ 5\%		\item matures inférieurs à 1\%. 
+\end{itemize}
+Cette représentation est utile pour analyser les tendances fines qui sont peu visibles dans les histogrammes empilés.
 
+\newpage
 \subsection{Variabilité par tranches (Boxplots)}
-Cette sous section analyse la dispersion des indicateurs clés (vivants, naissances, morts mensuels) et la stabilité des tendances au cours des 16 années simulées. L’objectif est d’évaluer la robustesse du modèle et la variabilité inter-mois et inter-simulations.
+Cette sous-section analyse la dispersion des indicateurs clés (vivants, naissances) et la stabilité des tendances au cours des 16 années simulées. L’objectif est d’évaluer la robustesse du modèle et la variabilité inter-mois et inter-simulations.
 Pour éviter la surcharge visuelle (192 mois), les données ont été regroupées en quatre tranches annuelles : Années 1--4, 5--8, 9--12, 13--16.
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{images/boxplot_vivants_tranches.png}
+  \includegraphics[width=1\linewidth]{images/boxplot_vivants_tranches.png}
   \caption{Variabilité par tranches (boîtes à moustaches) -- Vivants.}
 \end{figure}
+
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\textwidth]{images/boxplot_naissances_tranches.png}
+  \includegraphics[width=1\linewidth]{images/boxplot_naiss_mois_tranches.png}
   \caption{Variabilité par tranches -- Naissances.}
 \end{figure}
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=\textwidth]{images/boxplot_morts_tranches.png}
-  \caption{Variabilité par tranches -- Morts mensuels.}
-\end{figure}
 
+\newpage
 \subsection{Moyenne vs Médiane avec bande $\pm$ Écart-type}
 \begin{figure}[ht]
   \centering
@@ -312,9 +364,247 @@ Pour éviter la surcharge visuelle (192 mois), les données ont été regroupée
   \caption{Moyenne et médiane mensuelles des vivants, avec bande $\pm$ écart-type.}
 \end{figure}
 
+La figure illustre l’évolution mensuelle du nombre de lapins vivants en comparant la moyenne et la médiane, tout en intégrant une bande correspondant à l’écart-type. On observe que la moyenne et la médiane restent proches, ce qui indique une distribution relativement symétrique des valeurs au fil du temps. La bande ± écart-type met en évidence la variabilité : elle s’élargit progressivement, traduisant une dispersion croissante liée à l’augmentation de la population et aux effets stochastiques (naissances aléatoires). Cette représentation permet de juger à la fois de la tendance centrale et de la robustesse du modèle face aux fluctuations.
+
 \newpage
 \section{Conclusion}
 
-\section{Annexe}
+Cette étude a permis de modéliser et d’analyser la dynamique d’une population de lapins sur une période de 16 ans (192 mois) à l’aide d’une simulation stochastique. Le modèle intègre des paramètres biologiques réalistes tels que la fécondité, la maturité sexuelle, et des probabilités de survie différenciées par âge, ce qui offre une représentation crédible des processus démographiques.
+\newline
+Les résultats montrent une croissance rapide et soutenue de la population, avec un solde net positif tout au long de la période, bien que l’écart entre naissances et décès tende à se réduire en fin de simulation en raison du vieillissement et de la saturation. L’analyse de la structure des décès révèle une mortalité juvénile dominante (>90 \%), confirmant l’impact critique des premières phases de vie sur la dynamique globale.
+\newline
+L’étude de la variabilité met en évidence une dispersion croissante des effectifs et des flux au fil du temps, mais sans rupture majeure : la proximité entre moyenne et médiane et la stabilité des tendances centrales attestent de la robustesse du modèle face aux aléas stochastiques.
+\newline
+Ces observations soulignent que, malgré une forte sensibilité aux paramètres biologiques, la dynamique globale reste prévisible et cohérente. Ce travail constitue une base solide pour des analyses complémentaires, telles que des études de sensibilité ou des scénarios à long terme, afin d’évaluer l’impact de variations paramétriques sur la croissance et la stabilité de la population.
+\newpage
 
+% Style spécifique pour les annexes
+\renewcommand{\thesection}{Annexe \Alph{section}}
+\titleformat{\section}{\Large\bfseries\color{blue}}{\thesection}{1em}{}
+
+\begin{center}
+    {\Huge\bfseries\color{isimaRed} Annexe}
+\end{center}
+\vspace{1cm}
+
+\begin{lstlisting}[style=java, caption = {Fonction qui simule des simulations de probabilités en utilisant 2 tableaux}, label={lst:gener_proba}]
+private static int tirageProbaSelonPoids(double[] poids,MersenneTwister rng ) {
+        double total = 0;
+        double nbAlea;
+        double cumul = 0;
+        int i;
+        for (double p : poids) {
+            total += p;
+        }
+        
+        nbAlea = rng.nextDouble() * total;
+        for (i = 0; i < poids.length; i++) {
+            cumul += poids[i];
+            if (nbAlea < cumul) return i;
+        }
+        return poids.length - 1;
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style=java, caption = {Fonction qui initialise 2 tableaux contenant les proba de mort pour tous les ages possibles des lapins}, label={lst:initTab}]
+private static void initHazards() {
+        for (int age = 0; age <= MAX_AGE; age++) {
+            hazardMatureV1[age]    = (age == 180) ? 1.0
+                    : (age >= 168) ? 0.126
+                    : (age >= 156) ? 0.0997
+                    : (age >= 144) ? 0.0847
+                    : (age >= 132) ? 0.0698
+                    : (age >= 120) ? 0.0561
+                    : 0.0426;
+            hazardNonMatureV1[age] = 0.0649;
+            hazardMatureV2[age]    = (age == 180) ? 1.0
+                    : (age >= 168) ? 0.126
+                    : (age >= 156) ? 0.0997
+                    : (age >= 144) ? 0.0847
+                    : (age >= 132) ? 0.0698
+                    : (age >= 120) ? 0.0561
+                    : (age >= 108) ? 0.0426
+                    : (age >= 96)  ? 0.0296
+                    : 0.0184;
+            hazardNonMatureV2[age] = (age < 1) ? 0.8 : 0.0561;
+        }
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style=java, caption = {Fonction qui utilise les tableaux initialisés plus tôt}, label={lst:verifProbaMort}]
+private boolean estMortV1(Lapin lapin, double nbAlea) {
+        int a = Math.min(lapin.age, MAX_AGE);
+        final double h = lapin.estMature ? hazardMatureV1[a] : hazardNonMatureV1[a];
+        boolean mort = (nbAlea < h);
+
+        if (!mort && lapin.estMature && lapin.age >= MAX_AGE) {
+            mort = true;
+        }
+
+        if (mort) {
+            if (lapin.estMature) {
+                nbAdulteMort++;
+                nbAdulteMortTot++;
+            } else if (lapin.age < 1) {
+                nbBebeMort++;
+                nbBebeMortTot++;
+            } else {
+                nbEnfantMort++;
+                nbEnfantMortTot++;
+            }
+        }
+
+        return mort;
+    }
+    
+    private boolean estMortV2(Lapin lapin, double nbAlea) {
+        int a = Math.min(lapin.age, MAX_AGE);
+        final double h = lapin.estMature ? hazardMatureV2[a] : hazardNonMatureV2[a];
+        boolean mort = (nbAlea < h);
+        
+        if (!mort && lapin.estMature && lapin.age >= MAX_AGE) {
+            mort = true;
+        }
+        if (mort) {
+            if (lapin.estMature) {
+                nbAdulteMort++;
+                nbAdulteMortTot++;
+            } else if (lapin.age < 1) {
+                nbBebeMort++;
+                nbBebeMortTot++;
+            } else {
+                nbEnfantMort++;
+                nbEnfantMortTot++;
+            }
+        }
+        return mort;
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style=java, caption={Fonction qui utilise les fonctions VerifMortVX(... ) pour tuer les lapins et les retirer de la liste},
+  label={lst:verifMort}]
+public LinkedList<Lapin> verifMort(LinkedList<Lapin> population,MersenneTwister rng) {
+        LinkedList<Lapin> survivants = new LinkedList<>();
+        for (Lapin lapin : population) {
+            if (!estMortV2(lapin, rng.nextDouble())) {
+                survivants.add(lapin);
+            } else {
+                nbLapinMort++;
+                nbLapinMortTot++;
+            }
+        }
+        return survivants;
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style=java, caption={Fonction qui met à jour l'âge et le statut de maturité d'un lapin}, label={lst:misAJour}]
+private void miseAjourListe(MersenneTwister rng,LinkedList<Lapin> population) {
+        for (Lapin lapin : population){
+            if (lapin.sexe == 1 && lapin.age % 12 == 0){
+                lapin.nbPorteeRestante=nombrePortee(rng);
+            }
+
+            lapin.age+=1;
+
+            if (!lapin.estMature) {
+                if (lapin.age >= 8) lapin.estMature = true;
+                else if (lapin.age >= lapin.ageMaturite) {
+                    lapin.estMature = true;
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style = java, caption = {Fonction qui gère les naissances de lapin tous les mois}, label={lst:naissance}]
+public LinkedList<Lapin> naissance(LinkedList<Lapin> population, MersenneTwister rng) {
+        boolean malePresent = false;
+        int i;
+        Lapin currentLapin;
+        double[] poids = {0.25, 0.30, 0.45};
+        int[] possibilite = {5, 6, 7};
+
+        Iterator<Lapin> it = population.iterator();
+        while (it.hasNext() && !malePresent){
+            currentLapin = it.next();
+            if (currentLapin.sexe == 0 && currentLapin.estMature) {
+                malePresent = true;
+            }
+        }
+        miseAjourListe(rng,population);
+
+        if (!malePresent) return population;
+
+        LinkedList<Lapin> nouveaux = new LinkedList<>();
+        for (Lapin lapin : population) {
+
+            if (lapin.sexe == 1 && lapin.estMature && lapin.nbPorteeRestante > 0) {
+                if (lapin.nbEnfantEnGestation == 0) {
+                    lapin.nbPorteeRestante -= 1;
+                    lapin.nbEnfantEnGestation = nombreEnfants(rng);
+                } else {
+                    for (i = 0; i < lapin.nbEnfantEnGestation; i++) {
+                        // sexe aléatoire 0/1, ageMaturite tiré une fois à la naissance
+                        int sexe = rng.nextInt(2);
+                        int ageMaturite = possibilite[tirageProbaSelonPoids(poids, rng)];
+                        Lapin bebe = new Lapin(0, sexe, ageMaturite);
+                        nouveaux.add(bebe);
+                        nbLapinTot++;
+                        nbLapin++;
+                    }
+                    lapin.nbEnfantEnGestation = 0;
+                }
+            }
+        }
+        nouveaux.addAll(population);
+        return nouveaux;
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style=java, caption= {Fonction qui crée le fichier et qui ajoute l'entête du fichier dans un StringBuilder}, label={lst:loggerInit}]
+public LoggerCSV(String fileName, int dureeSimu, int numeroSimu) {
+        sb = new StringBuilder();
+
+        try {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd|MM_HH:mm"));
+            fileName +="_" + dureeSimu + "_mois_"+ timestamp+"_"+numeroSimu+".csv";
+            writer = new FileWriter(fileName);
+
+            sb.append("Timestamp : ");
+            sb.append(timestamp);
+            sb.append("\n");
+            
+            sb.append("Mois,Lapins vivants,Nombre de lapin juvéniles morts au total,Nombre de lapin enfant mort au total,Nombre de lapin adulte mort au total,Total de lapins morts,Nombre de naissance par mois,Nombre de lapin juvéniles morts par mois,Nombre de lapin enfant mort par mois,Nombre de lapin adulte mort par mois,Nombre de lapin mort en 1 mois\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+\end{lstlisting}
+
+\begin{lstlisting}[style=java, caption={Fonction qui ajoute les données de chaque mois de simulation dans le StringBuilder}, label={lst:ajoutDonneeLogger}]
+public void logMois(int mois, int vivants, int mortsTot, int mortsBebeTot, int mortsEnfantsTot, int mortsAdulteTot, int naissanceMois, int mortsBebe, int mortsEnfants, int mortsAdulte, int mortsParMois) {
+            sb.append(mois);
+            sb.append(",");
+            sb.append(vivants);
+            sb.append(",");
+            sb.append(mortsBebeTot);
+            sb.append(",");
+            sb.append(mortsEnfantsTot);
+            sb.append(",");
+            sb.append(mortsAdulteTot);
+            sb.append(",");
+            sb.append(mortsTot);
+            sb.append(",");
+            sb.append(naissanceMois);
+            sb.append(",");
+            sb.append(mortsBebe);
+            sb.append(",");
+            sb.append(mortsEnfants);
+            sb.append(",");
+            sb.append(mortsAdulte);
+            sb.append(",");
+            sb.append(mortsParMois);
+            sb.append("\n");
+    }
+\end{lstlisting}
 \end{document}

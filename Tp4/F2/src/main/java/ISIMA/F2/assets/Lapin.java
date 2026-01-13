@@ -16,7 +16,7 @@ public class Lapin {
     /**
      * Stocke l'information de la maturité du lapin
      */
-    public int estMature;
+    public boolean estMature;
     /**
      * Stocke l'age à partir duquel le lapin sera mature
      */
@@ -44,6 +44,6 @@ public class Lapin {
         nbPorteeRestante = 0;
         this.ageMaturite = ageMaturite;
         nbEnfantEnGestation = 0;
-        if (age >= ageMaturite) estMature =1;
+        if (age >= ageMaturite) estMature = true;
     }
 }

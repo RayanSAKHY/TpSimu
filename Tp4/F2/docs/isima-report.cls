@@ -22,11 +22,16 @@
 \RequirePackage{titlesec}
 \RequirePackage{enumitem}
 \RequirePackage{listings}
+\RequirePackage{cleveref}
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
 % --- En-têtes/pieds de page ---
 \RequirePackage{fancyhdr}
 \RequirePackage{lastpage} % pour X/Total
+
+% Index (permet des index nommés)
+\RequirePackage{imakeidx}
+\makeindex[name=code,title=Index du code] % index dédié aux extraits de code
 
 
 % Couleurs
@@ -34,6 +39,7 @@
 \definecolor{codegray}{RGB}{245,245,245}
 \definecolor{darkgray}{RGB}{80,80,80}
 
+\renewcommand{\lstlistlistingname}{Index des codes}
 
 % Listings Java
 \lstdefinestyle{java}{
@@ -47,6 +53,19 @@
   columns=fullflexible,
   breaklines=true
 }
+
+% Réglages globaux des listings
+\lstset{
+  float,                 % rend lstlisting "flottant" (comme figure)
+  captionpos=b,          % légende en bas
+  numbers=left,          % numéros de ligne à gauche
+  numberstyle=\tiny,
+  numbersep=6pt,
+  breaklines=true,
+  frame=single,
+  basicstyle=\ttfamily\small
+}
+
 
 % Entêtes/pieds de page
 \pagestyle{fancy}
