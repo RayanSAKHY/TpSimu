@@ -388,223 +388,242 @@ Ces observations soulignent que, malgré une forte sensibilité aux paramètres 
 \vspace{1cm}
 
 \begin{lstlisting}[style=java, caption = {Fonction qui simule des simulations de probabilités en utilisant 2 tableaux}, label={lst:gener_proba}]
-private static int tirageProbaSelonPoids(double[] poids,MersenneTwister rng ) {
-        double total = 0;
-        double nbAlea;
-        double cumul = 0;
-        int i;
-        for (double p : poids) {
-            total += p;
-        }
-        
-        nbAlea = rng.nextDouble() * total;
-        for (i = 0; i < poids.length; i++) {
-            cumul += poids[i];
-            if (nbAlea < cumul) return i;
-        }
-        return poids.length - 1;
+private static int tirageProbaSelonPoids(double[] poids, MersenneTwister rng) {
+  double total = 0;
+  double nbAlea;
+  double cumul = 0;
+  int i;
+
+  for (double p : poids) {
+    total += p;
+  }
+
+  nbAlea = rng.nextDouble() * total;
+
+  for (i = 0; i < poids.length; i++) {
+    cumul += poids[i];
+    if (nbAlea < cumul) {
+      return i;
     }
+  }
+  return poids.length - 1;
+}
 \end{lstlisting}
 
 \begin{lstlisting}[style=java, caption = {Fonction qui initialise 2 tableaux contenant les proba de mort pour tous les ages possibles des lapins}, label={lst:initTab}]
 private static void initHazards() {
-        for (int age = 0; age <= MAX_AGE; age++) {
-            hazardMatureV1[age]    = (age == 180) ? 1.0
-                    : (age >= 168) ? 0.126
-                    : (age >= 156) ? 0.0997
-                    : (age >= 144) ? 0.0847
-                    : (age >= 132) ? 0.0698
-                    : (age >= 120) ? 0.0561
-                    : 0.0426;
-            hazardNonMatureV1[age] = 0.0649;
-            hazardMatureV2[age]    = (age == 180) ? 1.0
-                    : (age >= 168) ? 0.126
-                    : (age >= 156) ? 0.0997
-                    : (age >= 144) ? 0.0847
-                    : (age >= 132) ? 0.0698
-                    : (age >= 120) ? 0.0561
-                    : (age >= 108) ? 0.0426
-                    : (age >= 96)  ? 0.0296
-                    : 0.0184;
-            hazardNonMatureV2[age] = (age < 1) ? 0.8 : 0.0561;
-        }
-    }
+  for (int age = 0; age <= MAX_AGE; age++) {
+     hazardMatureV1[age]    = (age == 180) ? 1.0
+              : (age >= 168) ? 0.126
+              : (age >= 156) ? 0.0997
+              : (age >= 144) ? 0.0847
+              : (age >= 132) ? 0.0698
+              : (age >= 120) ? 0.0561
+              : 0.0426;
+     hazardNonMatureV1[age] = 0.0649;
+     hazardMatureV2[age]    = (age == 180) ? 1.0
+              : (age >= 168) ? 0.126
+              : (age >= 156) ? 0.0997
+              : (age >= 144) ? 0.0847
+              : (age >= 132) ? 0.0698
+              : (age >= 120) ? 0.0561
+              : (age >= 108) ? 0.0426
+              : (age >= 96)  ? 0.0296
+              : 0.0184;
+     hazardNonMatureV2[age] = (age < 1) ? 0.8 : 0.0561;
+   }
+}
 \end{lstlisting}
+\newpage
 
 \begin{lstlisting}[style=java, caption = {Fonction qui utilise les tableaux initialisés plus tôt}, label={lst:verifProbaMort}]
 private boolean estMortV1(Lapin lapin, double nbAlea) {
-        int a = Math.min(lapin.age, MAX_AGE);
-        final double h = lapin.estMature ? hazardMatureV1[a] : hazardNonMatureV1[a];
-        boolean mort = (nbAlea < h);
+  int a = Math.min(lapin.age, MAX_AGE);
 
-        if (!mort && lapin.estMature && lapin.age >= MAX_AGE) {
-            mort = true;
-        }
+  final double h = lapin.estMature ? hazardMatureV1[a] : hazardNonMatureV1[a];
 
-        if (mort) {
-            if (lapin.estMature) {
-                nbAdulteMort++;
-                nbAdulteMortTot++;
-            } else if (lapin.age < 1) {
-                nbBebeMort++;
-                nbBebeMortTot++;
-            } else {
-                nbEnfantMort++;
-                nbEnfantMortTot++;
-            }
-        }
+  boolean mort = (nbAlea < h);
 
-        return mort;
+  if (!mort && lapin.estMature && lapin.age >= MAX_AGE) {
+    mort = true;
+  }
+
+  if (mort) {
+    if (lapin.estMature) {
+      nbAdulteMort++;
+      nbAdulteMortTot++;
+    } else {
+      nbEnfantMort++;
+      nbEnfantMortTot++;
     }
+  }
+
+  return mort;
+}
     
-    private boolean estMortV2(Lapin lapin, double nbAlea) {
-        int a = Math.min(lapin.age, MAX_AGE);
-        final double h = lapin.estMature ? hazardMatureV2[a] : hazardNonMatureV2[a];
-        boolean mort = (nbAlea < h);
-        
-        if (!mort && lapin.estMature && lapin.age >= MAX_AGE) {
-            mort = true;
-        }
-        if (mort) {
-            if (lapin.estMature) {
-                nbAdulteMort++;
-                nbAdulteMortTot++;
-            } else if (lapin.age < 1) {
-                nbBebeMort++;
-                nbBebeMortTot++;
-            } else {
-                nbEnfantMort++;
-                nbEnfantMortTot++;
-            }
-        }
-        return mort;
+private boolean estMortV2(Lapin lapin, double nbAlea) {
+  int a = Math.min(lapin.age, MAX_AGE);
+  final double h = lapin.estMature ? hazardMatureV2[a] : hazardNonMatureV2[a];
+  boolean mort = (nbAlea < h);
+  if (!mort && lapin.estMature && lapin.age >= MAX_AGE) {
+    mort = true;
+   }
+   if (mort) {
+     if (lapin.estMature) {
+     nbAdulteMort++;
+     nbAdulteMortTot++;
+   } else if (lapin.age < 1) {
+     nbBebeMort++;
+     nbBebeMortTot++;
+   } else {
+     nbEnfantMort++;
+     nbEnfantMortTot++;
     }
+  }
+  return mort;
+}
 \end{lstlisting}
-
+\newpage
 \begin{lstlisting}[style=java, caption={Fonction qui utilise les fonctions VerifMortVX(... ) pour tuer les lapins et les retirer de la liste},
   label={lst:verifMort}]
-public LinkedList<Lapin> verifMort(LinkedList<Lapin> population,MersenneTwister rng) {
-        LinkedList<Lapin> survivants = new LinkedList<>();
-        for (Lapin lapin : population) {
-            if (!estMortV2(lapin, rng.nextDouble())) {
-                survivants.add(lapin);
-            } else {
-                nbLapinMort++;
-                nbLapinMortTot++;
-            }
-        }
-        return survivants;
+public LinkedList<Lapin> verifMort(LinkedList<Lapin> population, MersenneTwister rng) {
+  // System.out.println("test entre mort : " +l.get(3).age);
+  LinkedList<Lapin> survivants = new LinkedList<>();
+  for (Lapin lapin : population) {
+    if (!estMortV2(lapin, rng.nextDouble())) {
+      survivants.add(lapin);
+    } else {
+      nbLapinMort++;
+      nbLapinMortTot++;
     }
+  }
+  // System.out.println("taille liste l : "+l.size());
+  return survivants;
+}
 \end{lstlisting}
 
 \begin{lstlisting}[style=java, caption={Fonction qui met à jour l'âge et le statut de maturité d'un lapin}, label={lst:misAJour}]
-private void miseAjourListe(MersenneTwister rng,LinkedList<Lapin> population) {
-        for (Lapin lapin : population){
-            if (lapin.sexe == 1 && lapin.age % 12 == 0){
-                lapin.nbPorteeRestante=nombrePortee(rng);
-            }
-
-            lapin.age+=1;
-
-            if (!lapin.estMature) {
-                if (lapin.age >= 8) lapin.estMature = true;
-                else if (lapin.age >= lapin.ageMaturite) {
-                    lapin.estMature = true;
-                }
-            }
-        }
+private void miseAjourListe(MersenneTwister rng, LinkedList<Lapin> population) {
+  for (Lapin lapin : population) {
+    if (lapin.sexe == 1 && lapin.age % 12 == 0) {
+      lapin.nbPorteeRestante = nombrePortee(rng);
     }
-\end{lstlisting}
 
+    lapin.age += 1;
+
+    if (!lapin.estMature) {
+      if (lapin.age >= 8) {
+        lapin.estMature = true;
+      } else if (lapin.age >= lapin.ageMaturite) {
+        lapin.estMature = true;
+      }
+    }
+  }
+}
+\end{lstlisting}
+\newpage
 \begin{lstlisting}[style = java, caption = {Fonction qui gère les naissances de lapin tous les mois}, label={lst:naissance}]
 public LinkedList<Lapin> naissance(LinkedList<Lapin> population, MersenneTwister rng) {
-        boolean malePresent = false;
-        int i;
-        Lapin currentLapin;
-        double[] poids = {0.25, 0.30, 0.45};
-        int[] possibilite = {5, 6, 7};
+  boolean malePresent = false;
+  Lapin currentLapin;
 
-        Iterator<Lapin> it = population.iterator();
-        while (it.hasNext() && !malePresent){
-            currentLapin = it.next();
-            if (currentLapin.sexe == 0 && currentLapin.estMature) {
-                malePresent = true;
-            }
-        }
-        miseAjourListe(rng,population);
-
-        if (!malePresent) return population;
-
-        LinkedList<Lapin> nouveaux = new LinkedList<>();
-        for (Lapin lapin : population) {
-
-            if (lapin.sexe == 1 && lapin.estMature && lapin.nbPorteeRestante > 0) {
-                if (lapin.nbEnfantEnGestation == 0) {
-                    lapin.nbPorteeRestante -= 1;
-                    lapin.nbEnfantEnGestation = nombreEnfants(rng);
-                } else {
-                    for (i = 0; i < lapin.nbEnfantEnGestation; i++) {
-                        // sexe aléatoire 0/1, ageMaturite tiré une fois à la naissance
-                        int sexe = rng.nextInt(2);
-                        int ageMaturite = possibilite[tirageProbaSelonPoids(poids, rng)];
-                        Lapin bebe = new Lapin(0, sexe, ageMaturite);
-                        nouveaux.add(bebe);
-                        nbLapinTot++;
-                        nbLapin++;
-                    }
-                    lapin.nbEnfantEnGestation = 0;
-                }
-            }
-        }
-        nouveaux.addAll(population);
-        return nouveaux;
+  Iterator<Lapin> it = population.iterator();
+  while (it.hasNext() && !malePresent) {
+    currentLapin = it.next();
+    if (currentLapin.sexe == 0 && currentLapin.estMature) {
+      malePresent = true;
     }
-\end{lstlisting}
+  }
+  miseAjourListe(rng, population);
 
+  if (!malePresent) {
+    return population;
+  }
+
+  double[] poids = {0.25, 0.30, 0.45};
+  int[] possibilite = {5, 6, 7};
+
+
+  LinkedList<Lapin> nouveaux = new LinkedList<>();
+  for (Lapin lapin : population) {
+
+    if (lapin.sexe == 1 && lapin.estMature && lapin.nbPorteeRestante > 0) {
+      if (lapin.nbEnfantEnGestation == 0) {
+        lapin.nbPorteeRestante -= 1;
+        lapin.nbEnfantEnGestation = nombreEnfants(rng);
+      } else {
+        for (int i = 0; i < lapin.nbEnfantEnGestation; i++) {
+          // sexe aléatoire 0/1, ageMaturite tiré une fois à la naissance
+          int sexe = rng.nextInt(2);
+          int ageMaturite = possibilite[tirageProbaSelonPoids(poids, rng)];
+          Lapin bebe = new Lapin(0, sexe, ageMaturite);
+          nouveaux.add(bebe);
+          nbLapinTot++;
+          nbLapin++;
+        }
+        lapin.nbEnfantEnGestation = 0;
+      }
+    }
+  }
+  nouveaux.addAll(population);
+  return nouveaux;
+}
+\end{lstlisting}
+\newpage
 \begin{lstlisting}[style=java, caption= {Fonction qui crée le fichier et qui ajoute l'entête du fichier dans un StringBuilder}, label={lst:loggerInit}]
-public LoggerCSV(String fileName, int dureeSimu, int numeroSimu) {
-        sb = new StringBuilder();
+public LoggerCsv(String fileName, int dureeSimu, int numeroSimu) {
+  sb = new StringBuilder();
 
-        try {
-            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd|MM_HH:mm"));
-            fileName +="_" + dureeSimu + "_mois_"+ timestamp+"_"+numeroSimu+".csv";
-            writer = new FileWriter(fileName);
+  try {
+    String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd|MM_HH:mm"));
+    fileName += "_" + dureeSimu + "_mois_" + timestamp + "_" + numeroSimu + ".csv";
+    writer = new FileWriter(fileName);
 
-            sb.append("Timestamp : ");
-            sb.append(timestamp);
-            sb.append("\n");
-            
-            sb.append("Mois,Lapins vivants,Nombre de lapin juvéniles morts au total,Nombre de lapin enfant mort au total,Nombre de lapin adulte mort au total,Total de lapins morts,Nombre de naissance par mois,Nombre de lapin juvéniles morts par mois,Nombre de lapin enfant mort par mois,Nombre de lapin adulte mort par mois,Nombre de lapin mort en 1 mois\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    // writer.write("Timestamp : "+ timestamp + "\n");
+    sb.append("Timestamp : ");
+    sb.append(timestamp);
+    sb.append("\n");
+
+    // writer.write("Mois,Lapins vivants,Nombre de lapin juvéniles morts au total,Nombre de lapin enfant mort au total,Nombre de lapin adulte mort au total,Total de lapins morts,Nombre de naissance par mois,Nombre de lapin juvéniles morts par mois,Nombre de lapin enfant mort par mois,Nombre de lapin adulte mort par mois,Nombre de lapin mort en 1 mois\n");
+    sb.append("Mois,Lapins vivants,Nombre de lapin juvéniles morts au total,Nombre de lapin enfant mort au total,Nombre de lapin adulte mort au total,Total de lapins morts,Nombre de naissance par mois,Nombre de lapin juvéniles morts par mois,Nombre de lapin enfant mort par mois,Nombre de lapin adulte mort par mois,Nombre de lapin mort en 1 mois\n");
+  } catch (IOException e) {
+    e.printStackTrace();
+  }
+}
 \end{lstlisting}
-
+\newpage
 \begin{lstlisting}[style=java, caption={Fonction qui ajoute les données de chaque mois de simulation dans le StringBuilder}, label={lst:ajoutDonneeLogger}]
 public void logMois(int mois, int vivants, int mortsTot, int mortsBebeTot, int mortsEnfantsTot, int mortsAdulteTot, int naissanceMois, int mortsBebe, int mortsEnfants, int mortsAdulte, int mortsParMois) {
-            sb.append(mois);
-            sb.append(",");
-            sb.append(vivants);
-            sb.append(",");
-            sb.append(mortsBebeTot);
-            sb.append(",");
-            sb.append(mortsEnfantsTot);
-            sb.append(",");
-            sb.append(mortsAdulteTot);
-            sb.append(",");
-            sb.append(mortsTot);
-            sb.append(",");
-            sb.append(naissanceMois);
-            sb.append(",");
-            sb.append(mortsBebe);
-            sb.append(",");
-            sb.append(mortsEnfants);
-            sb.append(",");
-            sb.append(mortsAdulte);
-            sb.append(",");
-            sb.append(mortsParMois);
-            sb.append("\n");
-    }
+  // try {
+  // StringBuilder sb = new StringBuilder();
+
+  sb.append(mois);
+  sb.append(",");
+  sb.append(vivants);
+  sb.append(",");
+  sb.append(mortsBebeTot);
+  sb.append(",");
+  sb.append(mortsEnfantsTot);
+  sb.append(",");
+  sb.append(mortsAdulteTot);
+  sb.append(",");
+  sb.append(mortsTot);
+  sb.append(",");
+  sb.append(naissanceMois);
+  sb.append(",");
+  sb.append(mortsBebe);
+  sb.append(",");
+  sb.append(mortsEnfants);
+  sb.append(",");
+  sb.append(mortsAdulte);
+  sb.append(",");
+  sb.append(mortsParMois);
+  sb.append("\n");
+
+  // writer.write(mois + "," + vivants + "," + mortsBebeTot + "," + mortsEnfantsTot + "," + mortsAdulteTot + "," + mortsTot +","+naissanceMois+","+ mortsBebe + "," + mortsEnfants + "," + mortsAdulte + ","+mortsParMois+ "\n");
+  // } catch (IOException e) {
+  //    e.printStackTrace();
+  // }
+}
 \end{lstlisting}
 \end{document}
